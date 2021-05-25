@@ -4,10 +4,10 @@ export function formatLargeNum(num) {
   if (isNaN(remaining)) return "∞" // TODO print NaN if needed
   let postfix = ""
   if (remaining > 1e9) {
-    postfix= "B"
+    postfix= "\u2009B"
     remaining = remaining / 1e9
   } else if (remaining > 1e6) {
-    postfix = "M"
+    postfix = "\u2009M"
     remaining = remaining / 1e6
   }
   if (remaining >= 1000) {

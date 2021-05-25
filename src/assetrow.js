@@ -52,7 +52,7 @@ export class AssetRow extends LitElement {
     return html`
     <div class="container mx-auto bg-white rounded-xl shadow-md overflow-hidden m-2">
     <div class="md:flex bg-gray-100">
-      <div class="md:flex-shrink-0">
+      <div class="md:flex-shrink-0 w-20">
         <a href="${homepage}" target="_blank">
           <div>
             <img class="m-2 h-12 w-12" src="${image.small}" alt="XXX">

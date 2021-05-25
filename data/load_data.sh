@@ -5,5 +5,6 @@ curl -X GET "https://api.coingecko.com/api/v3/coins/ethereum?localization=false"
 curl -X GET "https://api.coingecko.com/api/v3/coins/cardano?localization=false" -H "accept: application/json" > details_ada.json
 curl -X GET "https://api.coingecko.com/api/v3/coins/matic-network?localization=false" -H "accept: application/json" > details_matic.json
 curl -X GET "https://api.coingecko.com/api/v3/coins/solana?localization=false" -H "accept: application/json" > details_sol.json
+curl -X GET "https://api.coingecko.com/api/v3/coins/hot-cross?localization=false" -H "accept: application/json" > details_hot-cross.json
 
 ./load_charts.sh 30
