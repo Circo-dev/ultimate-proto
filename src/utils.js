@@ -28,3 +28,18 @@ export function formatLargeNum(num) {
     const idx = Math.max(5, Math.min(9, 10 - Math.round((Math.abs(value) / max) * 5)))
     return value > 0 ? "text-green-" + idx + "00" : "text-red-" + idx +"00"
   }
+
+  export function _priceat(prices, date, l, r) {
+    if (l >= r) return prices[l].value
+    const centeridx = Math.floor((l + r) / 2)
+    if (prices[centeridx].date < date) {
+      return _priceat(prices, date, centeridx + 1, r)
+    } else {
+      return _priceat(prices, date, l, centeridx - 1)
+    }
+  }
+
+  export function priceat(prices, date) {
+    if (!prices || !prices.length) return 0
+    return _priceat(prices, date, 0, prices.length - 1)
+  }

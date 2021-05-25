@@ -1,4 +1,5 @@
 import { html, LitElement } from "lit"
+import { priceat } from "./utils.js"
 import * as d3 from "d3"
 
 export class SimpleDiagram extends LitElement {
@@ -17,8 +18,6 @@ export class SimpleDiagram extends LitElement {
     constructor() {
         super();
         this.symbol = "N/A"
-        this.rulerdate = ""
-        this.prices = []
         this.id = "sd_" + Math.round(Math.random() * 1e12)
     }
 
@@ -39,10 +38,12 @@ export class SimpleDiagram extends LitElement {
                 "translate(" + margin.left + "," + margin.top + ")")
 
         const x = d3.scaleUtc()
+        const y = d3.scaleLinear()
+        let prices = null
 
         function update(date) {
-            //date = d3.utcDay.round(date);
-            rule.attr("transform", `translate(${x(date) + 0.5},0)`)
+            rule_v.attr("transform", `translate(${x(date) + 0.5},0)`)
+            rule_h.attr("transform", `translate(0, ${y(priceat(prices, date)) + 0.5})`)
             svg.property("value", date).dispatch("input")
         }
 
@@ -54,10 +55,10 @@ export class SimpleDiagram extends LitElement {
         const formattedData = fetch(`data/chart_${this.symbol}_usd.json`)
         .then(response => response.json())
         .then(chartdata => {
-            this.prices = chartdata.prices.map(d => {
+            prices = chartdata.prices.map(d => {
                 return {date: new Date(d[0]), value: d[1]}
             })
-            return  this.prices
+            return  prices
         })
   
 
@@ -72,8 +73,7 @@ export class SimpleDiagram extends LitElement {
                     .call(d3.axisBottom(x).ticks(6))
 
                 // Add Y axis
-                var y = d3.scaleLinear()
-                    .domain([d3.min(data, function (d) { return +d.value; }) * 0.98, d3.max(data, function (d) { return +d.value; })])
+                y.domain([d3.min(data, function (d) { return +d.value; }) * 0.98, d3.max(data, function (d) { return +d.value; })])
                     .range([height, 0]);
                 svg.append("g")
                     .style("stroke", "grey")
@@ -92,11 +92,17 @@ export class SimpleDiagram extends LitElement {
                 SimpleDiagram.syncedupdates.push(update)
             })
 
-        const rule = svg.append("g")
+        const rule_v = svg.append("g")
             .append("line")
             .attr("y1", height)
             .attr("y2", 0)
-            .attr("stroke", "black")
+            .attr("stroke", "brown")
+
+        const rule_h = svg.append("g")
+            .append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("stroke", "brown")
 
     }
 
