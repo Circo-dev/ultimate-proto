@@ -1,19 +1,23 @@
 
 export function formatLargeNum(num) {
-    if (isNaN(num)) return "∞" // TODO print NaN if needed
-    let postfix = ""
-    if (num > 1e9) {
-      postfix= "B"
-      num = num / 1e9
-    } else if (num > 1e6) {
-      postfix = "M"
-      num = num / 1e6
-    }
-    if (num > 1000) {
-      return "" + Math.ceil(num / 1000) + " " + Math.round( (num % 1000) * 10) / 10 + postfix
-    }
-    return "" + Math.round(num * 10) / 10 + postfix
+  let remaining = num
+  if (isNaN(remaining)) return "∞" // TODO print NaN if needed
+  let postfix = ""
+  if (remaining > 1e9) {
+    postfix= "B"
+    remaining = remaining / 1e9
+  } else if (remaining > 1e6) {
+    postfix = "M"
+    remaining = remaining / 1e6
   }
+  if (remaining >= 1000) {
+    return "" + Math.floor(remaining / 1000) + " " + Math.round( (remaining % 1000) * 10) / 10 + postfix
+  } else if (remaining >= 10) {
+    return "" + Math.round(remaining * 10) / 10 + postfix
+  } else {
+    return "" + Math.round(remaining * 100) / 100 + postfix
+  }  
+}
 
  export function formatPercentage(percentage, forceplus=true) {
     const sign = (forceplus && percentage > 0) ? "+" : ""
