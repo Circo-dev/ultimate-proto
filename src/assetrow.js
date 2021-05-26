@@ -15,6 +15,9 @@ export class AssetRow extends LitElement {
     this.symbol = "N/A"
     this.pocket = {}
     this.details = {}
+    this.interaction = {}
+    this.hasinteraction = false
+    this.interactiontimeout = null
   }
 
   loadDetails = () => {
@@ -22,7 +25,6 @@ export class AssetRow extends LitElement {
       .then(response => response.json())
       .then(details => {
         this.details = details
-        //console.log(details)
         this.requestUpdate()
       })
   }
@@ -35,6 +37,18 @@ export class AssetRow extends LitElement {
   }
 
   createRenderRoot() { return this } // turn off shadow dom to access external styles
+
+  handleDiagramInteraction = (e) => {
+    this.interaction = e.detail;
+    this.hasinteraction = true
+    if (!this.interactiontimeout) {
+      this.interactiontimeout = setTimeout(() => {
+        this.hasinteraction = false
+        this.interactiontimeout = null
+        this.requestUpdate()
+      }, 100)  
+    }
+  }
 
   render() {
     const base = "usd"
@@ -75,16 +89,20 @@ export class AssetRow extends LitElement {
             </div>
             <div class="inline-block border-l-2 pl-2">
                 <div class="inline-block tracking-wide">${formatLargeNum(market_cap[base])}</div>
-                <div class="text-xs text-gray-500">Mkt. Cap.</div>
+                <div class="text-xs text-gray-500">Mkt. cap.</div>
             </div>
             <div class="inline-block border-l-2 pl-2">
                 <div class="inline-block tracking-wide">${formatLargeNum(fully_diluted_valuation[base])}</div>
-                <div class="text-xs text-gray-500">Fully Diluted</div>
+                <div class="text-xs text-gray-500">Fully diluted</div>
             </div>
           </a>
         </div>
      </div>
-    <simple-diagram symbol="${this.symbol}"></simple-diagram>
+    <simple-diagram symbol="${this.symbol}" @interaction="${this.handleDiagramInteraction}"></simple-diagram>
+    <ath-analysis symbol="${this.symbol}"
+      assetdetails="${JSON.stringify(this.details)}"
+      interaction=${JSON.stringify(this.interaction)}>
+    </ath-analysis>
     <pocket-row-manager 
       assetdetails=${JSON.stringify(this.details)}
       pocket=${JSON.stringify(this.pocket)}>

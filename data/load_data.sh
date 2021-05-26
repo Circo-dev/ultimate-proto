@@ -7,4 +7,4 @@ curl -X GET "https://api.coingecko.com/api/v3/coins/matic-network?localization=f
 curl -X GET "https://api.coingecko.com/api/v3/coins/solana?localization=false" -H "accept: application/json" > details_sol.json
 curl -X GET "https://api.coingecko.com/api/v3/coins/hot-cross?localization=false" -H "accept: application/json" > details_hot-cross.json
 
-./load_charts.sh 30
+./load_charts.sh $1

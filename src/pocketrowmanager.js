@@ -27,7 +27,7 @@ export class PocketRowManager extends LitElement {
     const value = holdings * this.assetdetails.market_data.current_price[base]
     const { market_cap_rank } = this.assetdetails
     return html`
-    <div class="flex bg-gray-100">
+    <div class="flex bg-gray-100 hidden">
       <div class="flex-shrink-0">
         <div class="ml-4 bg-red-100" style="position:relative">
           <div style="position:absolute; top:100px">
@@ -35,7 +35,7 @@ export class PocketRowManager extends LitElement {
           </div>
         </div>
       </div>
-      <div class="ml-4 ">
+      <div class="ml-4">
         <div class="inline-block uppercase tracking-wide font-bold">${formatPercentage(Math.random() * 20, false)}</div>
         <div class="inline-block uppercase tracking-wide text-sm m-2">${formatLargeNum(holdings)} ${symbol},</div>
         <div class="inline-block uppercase tracking-wide text-sm">${formatLargeNum(value)} ${base}</div>
