@@ -28,10 +28,11 @@ export class Pocket extends LitElement {
   createRenderRoot() { return this } // turn off shadow dom to access external styles
 
   render() {
+    //<div class="text-xl font-bold">${this.name}</div>
     return html`
 <div class="my-2 ml-2">
-  <div class="text-xl font-bold">${this.name}</div>
-  ${["btc", "eth", "ada", "matic", "sol", "hot-cross"].map(
+  
+  ${["btc", "eth", "ada", "link", "cake"].map(
     symbol => {
       return html`<asset-row symbol="${symbol}" pocket=${JSON.stringify(this.pocket)}></asset-row>`
     }
