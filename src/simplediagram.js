@@ -43,7 +43,7 @@ export class SimpleDiagram extends LitElement {
     }
 
     firstUpdated() {
-        const margin = { top: 10, right: 10, bottom: 25, left: 45 },
+        const margin = { top: 10, right: 3, bottom: 25, left: 45 },
             width = 360 - margin.left - margin.right,
             height = 126 - margin.top - margin.bottom
 

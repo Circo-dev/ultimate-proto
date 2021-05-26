@@ -28,26 +28,31 @@ export class AthAnalysis extends LitElement {
     const {rulers, data} = this.interaction
     const {min, max} = data
     const { ath, ath_date, ath_change_percentage } = this.assetdetails.market_data
-    const currentprice_y = Math.max(16, Math.min(80, rulers.ypos))
+    const currentprice_y = Math.max(16, Math.min(70, rulers.ypos + 3))
     return html`
-<div class="flex bg-gray-100">
-    <div class="text-xs w-16 uppercase p-1" style="height:126px;position:relative">
-        <div style="position:absolute;top:2px">${formatLargeNum(max.value)}</div>
-        <div style="position:absolute;top:${currentprice_y}px">${formatLargeNum(rulers.price)}</div>
-        <div style="position:absolute;bottom:18px">${formatLargeNum(min.value)}</div>
-    </div>
-    <div class="text-sm my-2">
-        <div class="inline-block pl-2">
-        <div class="inline-block tracking-wide">${formatLargeNum(ath[base])}</div>
-        <div class="text-xs text-gray-500">All-time high</div>
-    </div>
-    <div class="inline-block pl-2 border-l-2">
-        <div class="inline-block tracking-wide">${formatSince(ath_date[base])}</div>
-        <div class="text-xs text-gray-500">Since ath.</div>
-    </div>
-    <div class="inline-block pl-2 border-l-2">
-        <div class="inline-block tracking-wide">${formatPercentage(ath_change_percentage[base])}</div>
-        <div class="text-xs text-gray-500">Drawdown</div>
+<div>
+    <div class="flex bg-gray-100">
+        <div class="text-xs w-16 uppercase w-16" style="height:126px;position:relative">
+            <div class="bg-blue-200 p-0.5 rounded-l-full border-1" style="position:absolute;top:2px">${formatLargeNum(max.value)}</div>
+            <div class="bg-blue-200 p-0.5 rounded-l-full border-1" style="z-index:1000;position:absolute;top:${currentprice_y}px">${formatLargeNum(rulers.price)}</div>
+            <div class="bg-blue-200 p-0.5 rounded-l-full border-1" style="position:absolute;bottom:18px">${formatLargeNum(min.value)}</div>
+        </div>
+        <div>
+            <div class="h-16"></div>
+            <div class="text-sm my-2">
+                <div class="inline-block pl-2">
+                <div class="inline-block tracking-wide">${formatLargeNum(ath[base])}</div>
+                <div class="text-xs text-gray-500">All-time high</div>
+            </div>
+            <div class="inline-block pl-2 border-l-2">
+                <div class="inline-block tracking-wide">${formatSince(ath_date[base])}</div>
+                <div class="text-xs text-gray-500">Since ath.</div>
+            </div>
+            <div class="inline-block pl-2 border-l-2">
+                <div class="inline-block tracking-wide">${formatPercentage(ath_change_percentage[base])}</div>
+                <div class="text-xs text-gray-500">Drawdown</div>
+            </div>
+        </div>
     </div>
 </div>
 `
