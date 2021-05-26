@@ -24,9 +24,23 @@ export class SimpleDiagram extends LitElement {
             max: NaN,
             raw: []
         }
+        this.rulers = {
+            price: NaN,
+            xpos: 0,
+            ypos: 0    
+        }
     }
 
     createRenderRoot() { return this }
+
+    fireInteraction() {
+        this.dispatchEvent(new CustomEvent('interaction', {
+            detail: {
+                rulers: this.rulers,
+                data: this.data
+            }
+        }))        
+    }
 
     firstUpdated() {
         const margin = { top: 10, right: 10, bottom: 25, left: 45 },
@@ -53,16 +67,12 @@ export class SimpleDiagram extends LitElement {
             rule_v.attr("transform", `translate(${xpos + 0.5},0)`)
             rule_h.attr("transform", `translate(0, ${ypos + 0.5})`)
             svg.property("value", date).dispatch("input")
-            this.dispatchEvent(new CustomEvent('interaction', {
-                detail: {
-                    rulers: {
-                        price: price,
-                        xpos: xpos,
-                        ypos: ypos    
-                    },
-                    data: this.data
-                }
-            }))
+            this.rulers = {
+                price: price,
+                xpos: xpos,
+                ypos: ypos    
+            }
+            this.fireInteraction()
         }
 
         function moved(event) {
@@ -78,11 +88,11 @@ export class SimpleDiagram extends LitElement {
             })
             return  prices
         })
-  
 
         formattedData.then(
             data => {
-                this.calcStats(data)
+                this.calcStats(data)    
+                this.fireInteraction()
                 // Add X axis --> it is a date format
                 x.domain(d3.extent(data, function (d) { return d.date; }))
                     .range([0, width])
@@ -108,6 +118,11 @@ export class SimpleDiagram extends LitElement {
                         .x(function (d) { return x(d.date) })
                         .y(function (d) { return y(d.value) })
                     )
+                rule_min.attr("transform", `translate(0,${y(this.data.min.value) + 0.5})`)
+                rule_min.attr("x1", x(this.data.min.date))
+                rule_max.attr("transform", `translate(0,${y(this.data.max.value) + 0.5})`)
+                rule_max.attr("x1", x(this.data.max.date))
+    
                 SimpleDiagram.syncedupdates.push(update.bind(this))
             })
 
@@ -125,17 +140,39 @@ export class SimpleDiagram extends LitElement {
             .attr("stroke", "brown")
             .attr("stroke-dasharray", "1,3")
 
+        const rule_min = svg.append("g")
+            .append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("stroke", "gray")
+            .attr("stroke-dasharray", "1,3")
+
+        const rule_max = svg.append("g")
+            .append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("stroke", "gray")
+            .attr("stroke-dasharray", "1,3")
     }
 
     calcStats(data) {
         let minval = Infinity
         let maxval = -Infinity
+        let min = {}
+        let max = {}
         for (var i = 1; i < data.length; i++) {
-            minval = Math.min(minval, data[i].value)
-            maxval = Math.max(maxval, data[i].value)
+            const val = data[i].value
+            if (val >= maxval) {
+                maxval = val
+                max = data[i]
+            }
+            if (val <= minval) {
+                minval = val
+                min = data[i]
+            }
         }
-        this.data.min = minval
-        this.data.max = maxval
+        this.data.min = min
+        this.data.max = max
     }
 
     render() {

@@ -28,13 +28,13 @@ export class AthAnalysis extends LitElement {
     const {rulers, data} = this.interaction
     const {min, max} = data
     const { ath, ath_date, ath_change_percentage } = this.assetdetails.market_data
-    const currentprice_y = Math.max(20, Math.min(78, rulers.ypos))
+    const currentprice_y = Math.max(16, Math.min(80, rulers.ypos))
     return html`
 <div class="flex bg-gray-100">
     <div class="text-xs w-16 uppercase p-1" style="height:126px;position:relative">
-        <div style="position:absolute;top:8px">${formatLargeNum(min)}</div>
+        <div style="position:absolute;top:2px">${formatLargeNum(max.value)}</div>
         <div style="position:absolute;top:${currentprice_y}px">${formatLargeNum(rulers.price)}</div>
-        <div style="position:absolute;bottom:20px">${formatLargeNum(max)}</div>
+        <div style="position:absolute;bottom:18px">${formatLargeNum(min.value)}</div>
     </div>
     <div class="text-sm my-2">
         <div class="inline-block pl-2">
