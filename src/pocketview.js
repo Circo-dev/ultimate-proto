@@ -14,6 +14,7 @@ export class Pocket extends LitElement {
   }
 
   loadPocket = () => {
+    return ; ////////////////// !!!!!!!!!!
     fetch(`data/portfolio/pocket_${this.name}.json`)
       .then(response => response.json())
       .then(pocket => {

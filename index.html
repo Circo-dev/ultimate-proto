@@ -6,12 +6,7 @@
         <script type="module" src="src/index.js"></script>
   </head>
     <body>
-        <div class="w-full h-9 p-2 bg-gray-50 shadow-md overflow-hidden flex justify-center">
-            <!--div class="">
-                <input type="checkbox" name="logscale" id="logscale">
-                <label for="logscale">Log scale</label>
-            </div-->
-        </div>
+        <global-controls onchange="document.location.reload()"></global-controls>
         <pocket-view name="Pension Fund"></pocket-view>        
     </body>
 </html>

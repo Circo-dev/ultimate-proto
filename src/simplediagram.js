@@ -1,5 +1,6 @@
 import { html, LitElement } from "lit"
 import { priceat } from "./utils.js"
+import { GlobalControls } from "./globalcontrols.js"
 import * as d3 from "d3"
 
 export class SimpleDiagram extends LitElement {
@@ -57,7 +58,7 @@ export class SimpleDiagram extends LitElement {
                 "translate(" + margin.left + "," + margin.top + ")")
 
         const x = d3.scaleUtc()
-        const y = d3.scaleLinear()
+        const y = GlobalControls.scaleType() == GlobalControls.LOG_SCALE ? d3.scaleLog() : d3.scaleLinear()
         let prices = null
 
         function update(date) {
@@ -103,10 +104,10 @@ export class SimpleDiagram extends LitElement {
 
                 // Add Y axis
                 y.domain([d3.min(data, function (d) { return +d.value; }) * 0.98, d3.max(data, function (d) { return +d.value; })])
-                    .range([height, 0]);
+                    .range([height, 0])
                 svg.append("g")
                     .style("stroke", "grey")
-                    .call(d3.axisLeft(y).ticks(6));
+                    .call(d3.axisLeft(y).ticks(5));
 
                 // Add the line
                 svg.append("path")
@@ -115,8 +116,8 @@ export class SimpleDiagram extends LitElement {
                     .attr("stroke", "steelblue")
                     .attr("stroke-width", 1)
                     .attr("d", d3.line()
-                        .x(function (d) { return x(d.date) })
-                        .y(function (d) { return y(d.value) })
+                        .x(d => x(d.date))
+                        .y(d => y(d.value))
                     )
                 rule_min.attr("transform", `translate(0,${y(this.data.min.value) + 0.5})`)
                 rule_min.attr("x1", x(this.data.min.date))
