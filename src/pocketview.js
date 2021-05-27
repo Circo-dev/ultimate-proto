@@ -33,7 +33,7 @@ export class Pocket extends LitElement {
     return html`
 <div class="my-2 ml-2">
   
-  ${["btc", "eth", "ada", "link", "cake"].map(
+  ${["btc", "eth", "ada", "link", "vet", "cake"].map(
     symbol => {
       return html`<asset-row symbol="${symbol}" pocket=${JSON.stringify(this.pocket)}></asset-row>`
     }
