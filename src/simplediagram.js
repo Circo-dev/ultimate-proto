@@ -5,6 +5,8 @@ import * as d3 from "d3"
 
 export class SimpleDiagram extends LitElement {
     static syncedupdates = []
+    static alldata = {}
+    static denominator = "usd"
 
     static updatesynced(target) {
         SimpleDiagram.syncedupdates.map(u => u(target))
@@ -48,20 +50,106 @@ export class SimpleDiagram extends LitElement {
             width = 360 - margin.left - margin.right,
             height = 126 - margin.top - margin.bottom
 
-        const svg = d3.select("." + this.id)
+        const root = d3.select("." + this.id)
             .on("mousemove touchmove", moved)
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")")
+            .on("click", clicked.bind(this))
 
-        const x = d3.scaleUtc()
-        const y = GlobalControls.scaleType() == GlobalControls.LOG_SCALE ? d3.scaleLog() : d3.scaleLinear()
+        let rule_max = null
+        let rule_min = null
+        let rule_h = null
+        let rule_v = null
+
+        let svg = null
+        let container = null
+
+        let x = null
+        let y = null
         let prices = null
+        let current_denominator = SimpleDiagram.denominator
+
+        const drawChart = () => {
+            const data = SimpleDiagram.alldata[this.symbol]
+            if (!data) return
+            prices = this.denominate(data)
+            if (!prices) return
+            current_denominator = SimpleDiagram.denominator
+            this.calcStats(prices)
+            this.fireInteraction()
+            if (container) {
+                container.remove()
+            }
+            container = root
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+
+            svg = container.append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+            x = d3.scaleUtc()
+            x.domain(d3.extent(prices, function (d) { return d.date; }))
+                .range([0, width])
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .style("stroke", "grey")
+                .call(d3.axisBottom(x).ticks(6))
+
+            y = GlobalControls.scaleType() == GlobalControls.LOG_SCALE ? d3.scaleLog() : d3.scaleLinear()
+            y.domain([d3.min(prices, function (d) { return +d.value; }) * 0.98, d3.max(prices, function (d) { return +d.value; })])
+                .range([height, 0])
+            svg.append("g")
+                .style("stroke", "grey")
+                .call(d3.axisLeft(y).ticks(5));
+
+            // Add the line
+            svg.append("path")
+                .datum(prices)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 1)
+                .attr("d", d3.line()
+                    .x(d => x(d.date))
+                    .y(d => y(d.value))
+                )
+
+            rule_v = svg.append("g")
+                .append("line")
+                .attr("y1", height)
+                .attr("y2", 0)
+                .attr("stroke", "brown")
+                .attr("stroke-dasharray", "1,3")
+    
+            rule_h = svg.append("g")
+                .append("line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("stroke", "brown")
+                .attr("stroke-dasharray", "1,3")
+    
+            rule_min = svg.append("g")
+                .append("line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("stroke", "gray")
+                .attr("stroke-dasharray", "1,3")
+    
+            rule_max = svg.append("g")
+                .append("line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("stroke", "gray")
+                .attr("stroke-dasharray", "1,3")
+
+            rule_min.attr("transform", `translate(0,${y(this.data.min.value) + 0.5})`)
+            rule_min.attr("x1", x(this.data.min.date))
+            rule_max.attr("transform", `translate(0,${y(this.data.max.value) + 0.5})`)
+            rule_max.attr("x1", x(this.data.max.date))
+            SimpleDiagram.updatesynced(new Date())
+        }
 
         function update(date) {
+            if (!svg || current_denominator != SimpleDiagram.denominator) drawChart()
+            if (!svg) return
             const xpos = x(date)
             const price = priceat(prices, date)
             const ypos = y(price)
@@ -81,6 +169,12 @@ export class SimpleDiagram extends LitElement {
             SimpleDiagram.updatesynced(target)
         }
 
+        function clicked(event) {
+            SimpleDiagram.denominator = SimpleDiagram.denominator == this.symbol ? "usd" : this.symbol
+            const target = x.invert(d3.pointer(event, this)[0] - margin.left)
+            SimpleDiagram.updatesynced(target)            
+        }
+
         const formattedData = fetch(`data/chart_${this.symbol}_usd.json`)
         .then(response => response.json())
         .then(chartdata => {
@@ -92,68 +186,10 @@ export class SimpleDiagram extends LitElement {
 
         formattedData.then(
             data => {
-                this.calcStats(data)    
-                this.fireInteraction()
-                // Add X axis --> it is a date format
-                x.domain(d3.extent(data, function (d) { return d.date; }))
-                    .range([0, width])
-                svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .style("stroke", "grey")
-                    .call(d3.axisBottom(x).ticks(6))
-
-                // Add Y axis
-                y.domain([d3.min(data, function (d) { return +d.value; }) * 0.98, d3.max(data, function (d) { return +d.value; })])
-                    .range([height, 0])
-                svg.append("g")
-                    .style("stroke", "grey")
-                    .call(d3.axisLeft(y).ticks(5));
-
-                // Add the line
-                svg.append("path")
-                    .datum(data)
-                    .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-width", 1)
-                    .attr("d", d3.line()
-                        .x(d => x(d.date))
-                        .y(d => y(d.value))
-                    )
-                rule_min.attr("transform", `translate(0,${y(this.data.min.value) + 0.5})`)
-                rule_min.attr("x1", x(this.data.min.date))
-                rule_max.attr("transform", `translate(0,${y(this.data.max.value) + 0.5})`)
-                rule_max.attr("x1", x(this.data.max.date))
-    
+                SimpleDiagram.alldata[this.symbol] = data
                 SimpleDiagram.syncedupdates.push(update.bind(this))
+                drawChart()
             })
-
-        const rule_v = svg.append("g")
-            .append("line")
-            .attr("y1", height)
-            .attr("y2", 0)
-            .attr("stroke", "brown")
-            .attr("stroke-dasharray", "1,3")
-
-        const rule_h = svg.append("g")
-            .append("line")
-            .attr("x1", 0)
-            .attr("x2", width)
-            .attr("stroke", "brown")
-            .attr("stroke-dasharray", "1,3")
-
-        const rule_min = svg.append("g")
-            .append("line")
-            .attr("x1", 0)
-            .attr("x2", width)
-            .attr("stroke", "gray")
-            .attr("stroke-dasharray", "1,3")
-
-        const rule_max = svg.append("g")
-            .append("line")
-            .attr("x1", 0)
-            .attr("x2", width)
-            .attr("stroke", "gray")
-            .attr("stroke-dasharray", "1,3")
     }
 
     calcStats(data) {
@@ -174,6 +210,22 @@ export class SimpleDiagram extends LitElement {
         }
         this.data.min = min
         this.data.max = max
+    }
+
+    denominate(data) {
+        if (SimpleDiagram.denominator == "usd") return data
+        const denom = SimpleDiagram.alldata[SimpleDiagram.denominator]
+        if (!denom) return null
+        const newdata = []
+        for (var i = 0; i < data.length; i++) {
+            const denomprice = priceat(denom, data[i].date)
+            const price = data[i].value / denomprice
+            newdata[i] = {
+                date: data[i].date,
+                value: price
+            }
+        }
+        return newdata
     }
 
     render() {
