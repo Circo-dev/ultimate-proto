@@ -27,11 +27,22 @@ export function formatNum(num) {
 
 export function formatSmallNum(num, postfix = "") {
   if (num > 1000) {
-    return "" + Math.floor(num / 1000) + " " + Math.round( (num % 1000) * 10) / 10 + postfix
-  } else if (num >= 10) {
+    let first = Math.floor(num / 1000)
+    let second = Math.round(num % 1000)
+    if (first > 0) {
+      if (second < 10) {
+        second = "00" + second
+      } else if (second < 100) {
+        second = "0" + second
+      }
+    }
+    return "" + first + " " + second + postfix
+  } else if (num >= 100) {
     return "" + Math.round(num * 10) / 10 + postfix
-  } else {
+  } else if (num >= 10) {
     return "" + Math.round(num * 100) / 100 + postfix
+  } else {
+    return "" + Math.round(num * 1000) / 1000 + postfix
   } 
 }
 
@@ -50,12 +61,14 @@ export function formatLargeNum(num) {
 }
 
 export function formatPercentage(percentage, forceplus=true) {
+  if (isNaN(percentage)) return ""
   const sign = (forceplus && percentage > 0) ? "+" : ""
   return sign + (Math.round(percentage * 10) / 10) + "%"
 }
 
 export function formatSince(date) {
   const diff = (Date.now() - Number(new Date(date))) / 86400000
+  if (isNaN(diff)) return ""
   return formatSmallNum(diff, " days")
 }
 

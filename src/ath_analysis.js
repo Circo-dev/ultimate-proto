@@ -33,9 +33,9 @@ export class AthAnalysis extends LitElement {
 <div>
     <div class="flex bg-gray-100">
         <div class="text-xs uppercase w-16" style="height:126px;position:relative">
-            <div class="bg-blue-200 pl-0.5 rounded-l-full border-1" style="padding-right:2px;position:absolute;top:2px">${formatLargeNum(max.value)}</div>
+            <div class="bg-gray-200 pl-0.5 rounded-l-full border-1" style="padding-right:2px;position:absolute;top:2px">${formatLargeNum(max.value)}</div>
             <div class="bg-blue-200 pl-0.5 rounded-l-full border-1" style="padding-right:2px;z-index:1000;position:absolute;top:${currentprice_y}px">${formatLargeNum(rulers.price)}</div>
-            <div class="bg-blue-200 pl-0.5 rounded-l-full border-1" style="padding-right:2px;position:absolute;bottom:18px">${formatLargeNum(min.value)}</div>
+            <div class="bg-gray-200 pl-0.5 rounded-l-full border-1" style="padding-right:2px;position:absolute;bottom:18px">${formatLargeNum(min.value)}</div>
         </div>
         <div>
             <div class="h-16"></div>
