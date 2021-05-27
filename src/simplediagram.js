@@ -1,12 +1,11 @@
 import { html, LitElement } from "lit"
-import { priceat } from "./utils.js"
+import { priceat, getDenominator, setDenominator, setPrice } from "./utils.js"
 import { GlobalControls } from "./globalcontrols.js"
 import * as d3 from "d3"
 
 export class SimpleDiagram extends LitElement {
     static syncedupdates = []
     static alldata = {}
-    static denominator = "usd"
 
     static updatesynced(target) {
         SimpleDiagram.syncedupdates.map(u => u(target))
@@ -36,12 +35,22 @@ export class SimpleDiagram extends LitElement {
 
     createRenderRoot() { return this }
 
+    getState() {
+        return{
+            rulers: this.rulers,
+            data: this.data
+        }
+    }
+
     fireInteraction() {
         this.dispatchEvent(new CustomEvent('interaction', {
-            detail: {
-                rulers: this.rulers,
-                data: this.data
-            }
+            detail: this.getState()
+        }))        
+    }
+
+    fireRequestUpdate() {
+        this.dispatchEvent(new CustomEvent('requestupdate', {
+            detail: this.getState()
         }))        
     }
 
@@ -65,14 +74,15 @@ export class SimpleDiagram extends LitElement {
         let x = null
         let y = null
         let prices = null
-        let current_denominator = SimpleDiagram.denominator
+
+        let current_denominator = getDenominator()
 
         const drawChart = () => {
             const data = SimpleDiagram.alldata[this.symbol]
             if (!data) return
-            prices = this.denominate(data)
+            prices = this.denominate_series(data)
             if (!prices) return
-            current_denominator = SimpleDiagram.denominator
+            current_denominator = getDenominator()
             this.calcStats(prices)
             this.fireInteraction()
             if (container) {
@@ -148,7 +158,7 @@ export class SimpleDiagram extends LitElement {
         }
 
         function update(date) {
-            if (!svg || current_denominator != SimpleDiagram.denominator) drawChart()
+            if (!svg || current_denominator != getDenominator()) drawChart()
             if (!svg) return
             const xpos = x(date)
             const price = priceat(prices, date)
@@ -170,9 +180,10 @@ export class SimpleDiagram extends LitElement {
         }
 
         function clicked(event) {
-            SimpleDiagram.denominator = SimpleDiagram.denominator == this.symbol ? "usd" : this.symbol
+            setDenominator(getDenominator() == this.symbol ? "usd" : this.symbol)
             const target = x.invert(d3.pointer(event, this)[0] - margin.left)
-            SimpleDiagram.updatesynced(target)            
+            this.fireRequestUpdate()
+            SimpleDiagram.updatesynced(target)
         }
 
         const formattedData = fetch(`data/chart_${this.symbol}_usd.json`)
@@ -181,6 +192,7 @@ export class SimpleDiagram extends LitElement {
             prices = chartdata.prices.map(d => {
                 return {date: new Date(d[0]), value: d[1]}
             })
+            setPrice(this.symbol, prices[prices.length - 1].value)
             return  prices
         })
 
@@ -212,11 +224,11 @@ export class SimpleDiagram extends LitElement {
         this.data.max = max
     }
 
-    denominate(data) {
-        if (SimpleDiagram.denominator == "usd") return data
-        const denom = SimpleDiagram.alldata[SimpleDiagram.denominator]
+    denominate_series(data) {
+        if (getDenominator() == "usd") return data
+        const denom = SimpleDiagram.alldata[getDenominator()]
         if (!denom) return null
-        const copyonly = SimpleDiagram.denominator == this.symbol
+        const copyonly = getDenominator() == this.symbol
         const newdata = []
         for (var i = 0; i < data.length; i++) {
             const denomprice = priceat(denom, data[i].date)

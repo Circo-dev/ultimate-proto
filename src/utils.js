@@ -1,3 +1,25 @@
+let denominator = "usd"
+
+export function setDenominator(d) {
+  denominator = d
+}
+
+export function getDenominator() {
+  return denominator
+}
+
+const prices = { usd: 1 }
+export function setPrice(symbol, priceinusd) {
+  prices[symbol] = priceinusd
+}
+
+export function denominate(priceinusd, targetsymbol) {
+  return priceinusd / prices[targetsymbol]
+}
+
+export function formatMoney(num, d = denominator, addpostfix = true) {
+  return formatNum(denominate(num, d)) + (addpostfix ? (" " + d) : "")
+}
 
 export function formatNum(num) {
   return num < 1000 ? formatSmallNum(num) : formatLargeNum(num)

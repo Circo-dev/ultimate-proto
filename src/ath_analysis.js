@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit'
-import { formatLargeNum, formatPercentage, formatSince } from "./utils.js"
+import { formatLargeNum, formatPercentage, formatMoney, formatSince, getDenominator } from "./utils.js"
 import * as d3 from "d3"
 
 export class AthAnalysis extends LitElement {
@@ -24,7 +24,7 @@ export class AthAnalysis extends LitElement {
         || !this.interaction || !this.interaction.rulers) {
         return html`<div class="m-2 text-xs"><-Interact</div>`
     }
-    const base = "usd"
+    const base = getDenominator()
     const {rulers, data} = this.interaction
     const {min, max} = data
     const { ath, ath_date, ath_change_percentage } = this.assetdetails.market_data
@@ -41,7 +41,7 @@ export class AthAnalysis extends LitElement {
             <div class="h-16"></div>
             <div class="text-sm my-2">
                 <div class="inline-block pl-2">
-                <div class="inline-block tracking-wide">${formatLargeNum(ath[base])}</div>
+                <div class="inline-block tracking-wide">${formatMoney(ath.usd, base, false)}</div>
                 <div class="text-xs text-gray-500">All-time high</div>
             </div>
             <div class="inline-block pl-2 border-l-2">

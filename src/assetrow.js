@@ -1,5 +1,5 @@
 import { html, css, LitElement } from "lit"
-import { formatLargeNum, formatPercentage, colorClass } from "./utils.js"
+import { formatLargeNum, formatPercentage, formatMoney, colorClass, getDenominator } from "./utils.js"
 
 
 export class AssetRow extends LitElement {
@@ -51,7 +51,7 @@ export class AssetRow extends LitElement {
   }
 
   render() {
-    const base = "usd"
+    const base = getDenominator()
     let { symbol, market_cap_rank, image, market_data, name, links, id} = this.details
     image = image || {}
     market_data = market_data || {}
@@ -78,21 +78,21 @@ export class AssetRow extends LitElement {
       <div class="px-4 py-2 w-60">
         <div><a href="${homepage}" target="_blank">${name}</a></div>
         <div class="my-2">
-            <div class="inline-block uppercase tracking-wide font-bold">${formatLargeNum(current_price[base])} ${base}</div>
+            <div class="inline-block uppercase tracking-wide font-bold">${formatMoney(current_price.usd, base)}</div>
             <div class="inline-block pl-1 tracking-wide ${colorClass(price_change_percentage_24h)}">${formatPercentage(price_change_percentage_24h)}</div>
         </div>
         <div class="text-sm my-2">
           <a href="https://www.coingecko.com/hu/coins/${id}">
             <div class="inline-block">
-                <div class="inline-block tracking-wide">${formatLargeNum(total_volume[base])}</div>
+                <div class="inline-block tracking-wide">${formatMoney(total_volume.usd, base, false)}</div>
                 <div class="text-xs text-gray-500">Vol.</div>
             </div>
             <div class="inline-block border-l-2 pl-2">
-                <div class="inline-block tracking-wide">${formatLargeNum(market_cap[base])}</div>
+                <div class="inline-block tracking-wide">${formatMoney(market_cap.usd, base, false)}</div>
                 <div class="text-xs text-gray-500">Mkt. cap.</div>
             </div>
             <div class="inline-block border-l-2 pl-2">
-                <div class="inline-block tracking-wide">${formatLargeNum(fully_diluted_valuation[base])}</div>
+                <div class="inline-block tracking-wide">${formatMoney(fully_diluted_valuation.usd, base, false)}</div>
                 <div class="text-xs text-gray-500">Fully diluted</div>
             </div>
           </a>

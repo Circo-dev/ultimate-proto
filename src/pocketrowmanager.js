@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit'
-import { formatLargeNum, formatPercentage, colorClass } from "./utils.js"
+import { formatLargeNum, formatPercentage, colorClass, getDenominator } from "./utils.js"
 import * as d3 from "d3"
 
 export class PocketRowManager extends LitElement {
@@ -19,7 +19,7 @@ export class PocketRowManager extends LitElement {
   createRenderRoot() { return this } // turn off shadow dom to access external styles
 
   render() {
-    const base = "usd"
+    const base = getDenominator()
     if (!this.assetdetails || !this.assetdetails.market_data || !this.pocket) return html``
     const symbol = this.assetdetails.symbol
     const holdings = this.pocket[symbol]

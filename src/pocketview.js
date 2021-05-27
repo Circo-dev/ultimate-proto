@@ -31,7 +31,7 @@ export class Pocket extends LitElement {
   render() {
     //<div class="text-xl font-bold">${this.name}</div>
     return html`
-<div class="my-2 ml-2">
+<div class="my-2 ml-2" @requestupdate=${e => this.requestUpdate()}>
   
   ${["btc", "eth", "ada", "link", "vet", "cake"].map(
     symbol => {
