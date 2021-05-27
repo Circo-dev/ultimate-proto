@@ -216,10 +216,11 @@ export class SimpleDiagram extends LitElement {
         if (SimpleDiagram.denominator == "usd") return data
         const denom = SimpleDiagram.alldata[SimpleDiagram.denominator]
         if (!denom) return null
+        const copyonly = SimpleDiagram.denominator == this.symbol
         const newdata = []
         for (var i = 0; i < data.length; i++) {
             const denomprice = priceat(denom, data[i].date)
-            const price = data[i].value / denomprice
+            const price = (copyonly ? 1 : data[i].value / denomprice)
             newdata[i] = {
                 date: data[i].date,
                 value: price

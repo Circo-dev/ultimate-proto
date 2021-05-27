@@ -45,7 +45,7 @@ export function colorClass(value, max = 4) {
 export function _priceat(prices, date, l, r) {
   if (l >= r) return prices[l].value
   const centeridx = Math.floor((l + r) / 2)
-  if (prices[centeridx].date < date) {
+  if (prices[centeridx].date <= date) {
     return _priceat(prices, date, centeridx + 1, r)
   } else {
     return _priceat(prices, date, l, centeridx - 1)
