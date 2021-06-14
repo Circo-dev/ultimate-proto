@@ -5,8 +5,7 @@ Frontend prototype for "Ultimate Defi"
 Prerequisites: node.js, curl
 
 ```bash
-npm install
-./gencss.sh
+npm run build
 cd data && ./load_data.sh
 npm start
 ```

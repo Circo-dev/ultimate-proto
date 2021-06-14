@@ -16,7 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "snowpack dev",
-    "build": "snowpack build",
+    "build": "postcss css/index.css -o generated.css && snowpack build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
