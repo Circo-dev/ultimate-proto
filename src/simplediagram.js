@@ -1,6 +1,8 @@
 import { html, LitElement } from "lit"
 import { priceat, getDenominator, setDenominator, setPrice } from "./utils.js"
 import { GlobalControls } from "./globalcontrols.js"
+import * as msgpack from '@ygoe/msgpack'
+import { exec } from './papi.js'
 import * as d3 from "d3"
 
 export class SimpleDiagram extends LitElement {
@@ -186,12 +188,14 @@ export class SimpleDiagram extends LitElement {
             SimpleDiagram.updatesynced(target)
         }
 
-        const formattedData = fetch(`data/chart_${this.symbol}_usd.json`)
-        .then(response => response.json())
+        const formattedData = exec("Last7Days -> JSON")
         .then(chartdata => {
-            prices = chartdata.prices.map(d => {
-                return {date: new Date(d[0]), value: d[1]}
-            })
+            const highs = chartdata.High
+            const tss = chartdata.TimeStamp
+            const prices = []
+            for (var i = 0; i < highs.length; i++) {
+                prices.push({date: new Date(tss[i]), value: highs[i]})
+            }
             setPrice(this.symbol, prices[prices.length - 1].value)
             return  prices
         })
